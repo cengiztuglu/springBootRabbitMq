@@ -1,12 +1,12 @@
 package com.example.springBootRabbitMq.producer;
 
-import com.example.springBootRabbitMq.model.Notification;
-import jakarta.annotation.PostConstruct;
+import com.example.springBootRabbitMq.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 
 
 @Service
@@ -18,12 +18,19 @@ public class NotificationProducer {
     @Value("${rabbit.exchange.name}")
     private String exchangeName;
 
+    @Value("${rabbit.routing.json.key}")
+    private String jsonKey;
 
-    @Autowired
+    private  static final Logger LOGGER= LoggerFactory.getLogger(NotificationProducer.class);
     private RabbitTemplate rabbitTemplate;
+    public NotificationProducer(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
-    public void sendToQueue(Notification notification) {
-        System.out.println("Notification Sent ID : " + notification.getNotificationId());
-        rabbitTemplate.convertAndSend(exchangeName, routingName, notification);
+
+
+    public void sendJsonMessage(User user) {
+     LOGGER.info(String.format("jsonMessage sent ->%s",user.toString()));
+     rabbitTemplate.convertAndSend(exchangeName,routingName,user);
     }
 }
